@@ -44,13 +44,24 @@ pollutantmean <- function(directory, pollutant, id=1:332){
         }
         df <- read.csv(csvName)
         ##calculate mean for each monitor
-        means[i]<-mean(df[[pollutant]], na.rm=TRUE)
-        ##calculate also number of valid measurements, used to weight the score
-        numValidMeasurements[i] <- sum(!is.na(df[[pollutant]]))
-        i <- i + 1
+        ##Check that there is atleast one correct measurement
+        if(sum(!is.na(df[[pollutant]])) > 0){
+            means[i]<-mean(df[[pollutant]], na.rm=TRUE)
+            ##calculate also number of valid measurements, used to weight the score
+            numValidMeasurements[i] <- sum(!is.na(df[[pollutant]]))
+            i <- i + 1
+        }
     }
     ##Calculate the mean of means. Weighted by # of valid data points
-    allMeans <- means * numValidMeasurements / sum(numValidMeasurements)
-    sum(allMeans)
+    ##NOTE:if numValidMeasurements is 0, then return 0
+    if(sum(numValidMeasurements) == 0)
+    {
+        return(0)
+    } 
+    else 
+    {
+        allMeans <- means * numValidMeasurements / sum(numValidMeasurements)
+        sum(allMeans)
+    }
     ##And we're done!!!
 }
